@@ -37,7 +37,7 @@ export default defineNuxtConfig({
       pusherKey: env.PUSHER_KEY,
       pusherHost: env.PUSHER_HOST,
       pusherPort: env.PUSHER_PORT,
-      pusherSecure: env.PUSHER_SECRET,
+      pusherSecure: env.NUXT_PUBLIC_PUSHER_SECURE,
       pusherCluster: env.PUSHER_CLUSTER ?? "eu"
     }
   }

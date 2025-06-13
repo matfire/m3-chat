@@ -25,6 +25,7 @@
     "@nuxtjs/color-mode": "3.5.2",
     "@openrouter/ai-sdk-provider": "^0.7.1",
     "@pinia/nuxt": "0.11.1",
+    "@shikijs/markdown-it": "^3.6.0",
     "@tailwindcss/vite": "^4.1.8",
     "@vueuse/core": "^13.3.0",
     "ai": "^4.3.16",
@@ -35,6 +36,7 @@
     "drizzle-orm": "^0.44.2",
     "eslint": "^9.28.0",
     "lucide-vue-next": "^0.513.0",
+    "markdown-it": "^14.1.0",
     "nuxt": "^3.17.5",
     "pinia": "^3.0.3",
     "pusher": "^5.2.0",
@@ -49,8 +51,11 @@
     "zod": "^3.25.64"
   },
   "devDependencies": {
+    "@iconify-json/radix-icons": "^1.2.2",
+    "@iconify-json/uil": "^1.2.3",
     "concurrently": "^9.1.2",
     "dotenv": "^16.5.0",
     "drizzle-kit": "^0.31.1"
-  }
+  },
+  "packageManager": "pnpm@10.12.1+sha512.f0dda8580f0ee9481c5c79a1d927b9164f2c478e90992ad268bbb2465a736984391d6333d2c327913578b2804af33474ca554ba29c04a8b13060a717675ae3ac"
 }

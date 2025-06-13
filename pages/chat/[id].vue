@@ -2,6 +2,7 @@
     const route = useRoute()
     const data = await useFetch(`/api/chat/${route.params.id}`)
     const chatStore = useChatStore()
+    const mdParser = useParser()
 
     onMounted(() => {
         const pusher = usePusher()
@@ -37,7 +38,10 @@
             <div v-for="message in data.data.value?.messages" :key="message.id" :class="{'self-end' : message.sender === 'assistant', 'max-w-3/4': true}">
                 <Card class="w-fit">
                     <CardContent>
-                        {{ message.content }}
+                        <p v-if="message.sender === 'user'">
+                            {{ message.content }}
+                        </p>
+                        <MdRenderer v-else :content="message.content" />
                     </CardContent>
                 </Card>
             </div>

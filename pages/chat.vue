@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-const { data, refresh } = await useFetch("/api/chat/all")
+const { data, refresh } = await useFetch("/api/chat/all", {lazy:true})
 
 const route = useRoute()
 
