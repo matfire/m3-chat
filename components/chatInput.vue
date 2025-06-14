@@ -9,6 +9,7 @@
     const handleSubmit = (e) => {
         e.preventDefault()
         emit('submit', value.value)
+        value.value = ""
     }
 </script>
 
