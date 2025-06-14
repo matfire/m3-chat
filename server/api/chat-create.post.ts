@@ -1,12 +1,12 @@
-import { type } from "arktype"
+import { z } from "zod/v4"
 import { db } from "~/lib/db"
 import { chat, message } from "~/lib/db/schemas"
 import { pusher } from "~/lib/pusher/server"
-import { generatePrivateChannel, NEW_CHAT } from "~/lib/pusher/utils"
+import { generatePrivateChannel, NEW_CHAT, NewChatSchema } from "~/lib/pusher/utils"
 
-const requestSchema = type({
-    modelId: "string",
-    message: "string"
+const requestSchema = z.object({
+    modelId: z.string(),
+    message: z.string()
 })
 
 export default defineEventHandler(async(event) => {
@@ -14,8 +14,7 @@ export default defineEventHandler(async(event) => {
     if (!user) {
         throw Error("unauthorized")
     }
-    const body = await readBody(event)
-    const data = requestSchema.assert(body)
+    const data = requestSchema.parse(await readBody(event))
     const newChat = await db.insert(chat).values({
         userId: user.id,
         modelId: data.modelId,
@@ -27,7 +26,11 @@ export default defineEventHandler(async(event) => {
         status: "done",
         chatId: newChat[0].id
     })
-    await pusher.trigger(generatePrivateChannel(user.id, "titles"), NEW_CHAT, {id: newChat[0].id, title: "New Chat"})
+    const pusherData: NewChatSchema = {
+        id: newChat[0].id,
+        title: "New Chat"
+    }
+    await pusher.trigger(generatePrivateChannel(user.id, "titles"), NEW_CHAT, pusherData)
     event.$fetch("/api/chat-thread", {
         method:"POST",
         body: {

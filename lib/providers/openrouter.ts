@@ -1,9 +1,9 @@
-import { type } from "arktype";
+import { z } from "zod/v4";
 import { Provider, type ProviderModel } from "./base";
 
-const ModelSchema = type({
-    "id": "string",
-    "name": "string"
+const ModelSchema = z.object({
+    "id": z.string(),
+    "name": z.string()
 })
 
 export class OpenRouterProvider extends Provider {
@@ -12,7 +12,7 @@ export class OpenRouterProvider extends Provider {
     }
     public static override async getModels(): Promise<ProviderModel[]> {
         const data = await (await fetch("https://openrouter.ai/api/v1/models")).json()
-        const models = ModelSchema.array().assert(data.data)
+        const models = ModelSchema.array().parse(data.data)
         return models.map((m) => ({
             name: m.name,
             id: m.id,

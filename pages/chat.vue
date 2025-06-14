@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { generatePrivateChannel, NEW_CHAT, TITLE_UPDATED } from '~/lib/pusher/utils'
+import { generatePrivateChannel, NEW_CHAT, TITLE_UPDATED, type NewChatSchema, type TitleUpdatedSchema } from '~/lib/pusher/utils'
 
-const { data, refresh } = await useFetch("/api/chat/all", { lazy: true })
+const { data } = await useFetch("/api/chat/all", { lazy: true })
 const authStore = useAuthStore()
 
 const route = useRoute()
@@ -15,7 +15,7 @@ onMounted(() => {
     const pusher = usePusher()
 
     const channel = pusher.subscribe(generatePrivateChannel(authStore.user?.id, "titles"))
-    channel.bind(TITLE_UPDATED, (data) => {
+    channel.bind(TITLE_UPDATED, (data: TitleUpdatedSchema) => {
         const existingIndex = elements.value.findIndex(t => t.id === data.id);
         if (existingIndex !== -1) {
             elements.value[existingIndex].title = data.title;
@@ -24,14 +24,14 @@ onMounted(() => {
         }
     })
 
-    channel.bind(NEW_CHAT, (data) => {
+    channel.bind(NEW_CHAT, (data: NewChatSchema) => {
         elements.value.unshift({title: data.title, id: data.id})
     })
 
 })
 
 const handleDelete = async (chatId: string) => {
-    const data = await $fetch(`/api/chat/${chatId}`, {
+    await $fetch(`/api/chat/${chatId}`, {
         method: "DELETE"
     })
     const existingIndex = elements.value.findIndex(t => t.id === chatId);

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { generatePrivateChannel, MESSAGE_DONE_EVENT, MESSAGE_UPDATE_EVENT } from '~/lib/pusher/utils'
+import { generatePrivateChannel, MESSAGE_DONE_EVENT, MESSAGE_UPDATE_EVENT, type MessageDoneSchema, type MessageUpdateSchema } from '~/lib/pusher/utils'
 
     const route = useRoute()
     const {data} = await useFetch(`/api/chat/${route.params.id}`, {lazy: true, method:"get"})
@@ -9,10 +9,10 @@ import { generatePrivateChannel, MESSAGE_DONE_EVENT, MESSAGE_UPDATE_EVENT } from
     onMounted(() => {
         const pusher = usePusher()
         const chatChannel = pusher.subscribe(generatePrivateChannel(authStore.user?.id, `chat-${route.params.id}`))
-        chatChannel.bind(MESSAGE_UPDATE_EVENT, (data) => {
-            currentMessageStreaming.value += data.chunk
+        chatChannel.bind(MESSAGE_UPDATE_EVENT, (data: MessageUpdateSchema) => {
+            currentMessageStreaming.value += data.text
         })
-        chatChannel.bind(MESSAGE_DONE_EVENT, (data) => {
+        chatChannel.bind(MESSAGE_DONE_EVENT, (data: MessageDoneSchema) => {
             console.log(data)
             chatStore.setIsLoading(false)
         })
