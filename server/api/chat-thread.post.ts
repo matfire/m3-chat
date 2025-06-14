@@ -4,7 +4,7 @@ import { generateChatTitle } from "~/lib/ai"
 import { db } from "~/lib/db"
 import { chat, message } from "~/lib/db/schemas"
 import { pusher } from "~/lib/pusher/server"
-import { generatePrivateChannel } from "~/lib/pusher/utils"
+import { generatePrivateChannel, TITLE_UPDATED } from "~/lib/pusher/utils"
 
 const requestSchema = type({
     chatId: "string"
@@ -22,5 +22,5 @@ export default defineEventHandler(async (event) => {
     if (chatMessages.length < 1 || !chatMessages[0].content) throw Error("invalid content")
     const chatTitle = await generateChatTitle(chatMessages[0].content!)
     await db.update(chat).set({ title: chatTitle }).where(eq(chat.id, data.chatId))
-    await pusher.trigger(generatePrivateChannel(user.id, "titles"), 'title_updated', {chatId: data.chatId, title: chatTitle})
+    await pusher.trigger(generatePrivateChannel(user.id, "titles"), TITLE_UPDATED, {chatId: data.chatId, title: chatTitle})
 })

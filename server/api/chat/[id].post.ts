@@ -3,6 +3,7 @@ import { and, eq, isNotNull, ne } from "drizzle-orm"
 import { generateMessage } from "~/lib/ai"
 import { db } from "~/lib/db"
 import { chat, message } from "~/lib/db/schemas"
+import { getParser } from "~/lib/md/parser"
 import { pusher } from "~/lib/pusher/server"
 import { generatePrivateChannel, MESSAGE_DONE_EVENT, MESSAGE_UPDATE_EVENT } from "~/lib/pusher/utils"
 
@@ -39,14 +40,15 @@ export default defineEventHandler(async(event) => {
         let text = ""
         for await (const chunk of responseStream) {
             text += chunk
-            console.log(chunk)
             await db.update(message).set({
                 content: text
             }).where(eq(message.id, messageInstance[0].id))
-            console.log(await pusher.trigger(generatePrivateChannel(event.context.user?.id, `chat-${chatInstance.id}`), MESSAGE_UPDATE_EVENT, {messageId: messageInstance[0].id, text: chunk}))
+            await pusher.trigger(generatePrivateChannel(event.context.user?.id, `chat-${chatInstance.id}`), MESSAGE_UPDATE_EVENT, {messageId: messageInstance[0].id, text: chunk})
         }
+        const rendererContent = await getParser().process(text)
         await db.update(message).set({
             status: "done",
+            rendererContent: rendererContent.toString()
         }).where(eq(message.id, messageInstance[0].id))
         await pusher.trigger(generatePrivateChannel(event.context.user?.id, `chat-${chatInstance.id}`), MESSAGE_DONE_EVENT, {messageId: messageInstance[0].id})
         resolve()

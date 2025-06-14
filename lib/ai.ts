@@ -27,7 +27,6 @@ export const generateChatTitle = async(initialMessage:string) => {
                 """
             Only return your idea of a thread title and nothing else
         `})
-        console.log(text)
     return text
 }
 

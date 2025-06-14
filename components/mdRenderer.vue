@@ -1,13 +1,16 @@
 <script lang="ts" setup>
+import { computedAsync } from '@vueuse/core';
+import { getParser } from '~/lib/md/parser';
+
     const props = defineProps<{
         content:string
     }>()
 
-    const renderer = useParser()
+    const renderer = getParser()
 
-    const value = computed(() => {
-        return renderer.render(props.content)
-    })
+    const value = computedAsync(async() => {
+        return await renderer.process(props.content)
+    }, null)
 </script>
 
 <template>

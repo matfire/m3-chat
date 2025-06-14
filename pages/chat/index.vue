@@ -8,7 +8,6 @@
             message: input,
             modelId: selectedModel.value
         }})
-        console.log(res)
         navigateTo(`/chat/${res.chatId}`)
         chatStore.setIsLoading(false)
     }

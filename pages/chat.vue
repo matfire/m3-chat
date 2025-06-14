@@ -1,28 +1,41 @@
 <script lang="ts" setup>
-import { generatePrivateChannel } from '~/lib/pusher/utils'
+import { generatePrivateChannel, NEW_CHAT, TITLE_UPDATED } from '~/lib/pusher/utils'
 
-const { data, refresh } = await useFetch("/api/chat/all", {lazy:true})
+const { data, refresh } = await useFetch("/api/chat/all", { lazy: true })
 const authStore = useAuthStore()
 
 const route = useRoute()
+
+const elements = ref<Array<{ id: string, title: string | null }>>(data.value || [])
+
+
 
 onMounted(() => {
 
     const pusher = usePusher()
 
     const channel = pusher.subscribe(generatePrivateChannel(authStore.user?.id, "titles"))
-    channel.bind("title_updated", (data) => {
-        console.log(data)
+    channel.bind(TITLE_UPDATED, (data) => {
+        const existingIndex = elements.value.findIndex(t => t.id === data.id);
+        if (existingIndex !== -1) {
+            elements.value[existingIndex].title = data.title;
+        } else {
+            elements.value.unshift(data);
+        }
+    })
+
+    channel.bind(NEW_CHAT, (data) => {
+        elements.value.unshift({title: data.title, id: data.id})
     })
 
 })
 
-const handleDelete = async(chatId: string) => {
+const handleDelete = async (chatId: string) => {
     const data = await $fetch(`/api/chat/${chatId}`, {
         method: "DELETE"
     })
-    console.log(data)
-    refresh()
+    const existingIndex = elements.value.findIndex(t => t.id === chatId);
+    elements.value.splice(existingIndex, 1)
     if (route.params.id && route.params.id === chatId) {
         navigateTo("/chat")
     }
@@ -41,7 +54,7 @@ const handleDelete = async(chatId: string) => {
             </SidebarHeader>
             <SidebarContent>
                 <SidebarMenu class="space-y-6">
-                    <SidebarMenuItem v-for="chat in data" :key="chat.id">
+                    <SidebarMenuItem v-for="chat in elements" :key="chat.id">
                         <SidebarMenuButton as-child>
                             <NuxtLink :to="`/chat/${chat.id}`">{{ chat.title }}</NuxtLink>
                             <Button @click="() => handleDelete(chat.id)">

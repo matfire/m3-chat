@@ -16,5 +16,6 @@ export const message = sqliteTable("message", {
     chatId: text('chat_id').notNull().references(() => chat.id, {onDelete: 'cascade'}),
     sender: text().$type<MessageSender>().notNull(),
     status: text().$type<MessageStatus>().notNull(),
-    content: text()
+    content: text(),
+    rendererContent: text()
 })

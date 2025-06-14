@@ -1,6 +1,8 @@
 import { type } from "arktype"
 import { db } from "~/lib/db"
 import { chat, message } from "~/lib/db/schemas"
+import { pusher } from "~/lib/pusher/server"
+import { generatePrivateChannel, NEW_CHAT } from "~/lib/pusher/utils"
 
 const requestSchema = type({
     modelId: "string",
@@ -25,6 +27,7 @@ export default defineEventHandler(async(event) => {
         status: "done",
         chatId: newChat[0].id
     })
+    await pusher.trigger(generatePrivateChannel(user.id, "titles"), NEW_CHAT, {id: newChat[0].id, title: "New Chat"})
     event.$fetch("/api/chat-thread", {
         method:"POST",
         body: {
