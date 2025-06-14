@@ -18,6 +18,7 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "@ai-sdk/google": "^1.2.19",
     "@libsql/client": "^0.15.8",
     "@nuxt/eslint": "1.4.1",
     "@nuxt/fonts": "0.11.4",
@@ -41,6 +42,7 @@
     "pusher-js": "^8.4.0",
     "rehype-stringify": "^10.0.1",
     "reka-ui": "^2.3.1",
+    "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.2",
     "shadcn-nuxt": "2.2.0",

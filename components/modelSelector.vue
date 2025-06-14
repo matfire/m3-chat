@@ -1,12 +1,14 @@
 <script lang="ts" setup>
-    import {availableModels} from "~/lib/models"
+
+    const {data} = await useFetch("/api/providers/all")
     const emit = defineEmits<{
-        selectModel: [value: string]
+        selectModel: [modelProvider:string, modelId: string]
     }>()
 
     const handleChange = (value:string | null) => {
         if (!value) return
-        emit("selectModel", value)
+        const [provider, modelId] = value.split("___")
+        emit("selectModel", provider, modelId)
     }
 </script>
 
@@ -16,10 +18,10 @@
             <SelectValue placeholder="Select a model" />
         </SelectTrigger>
         <SelectContent>
-            <SelectGroup v-for="category, categoryName in availableModels">
-                <SelectLabel>{{categoryName}}</SelectLabel>
-                <SelectItem v-for="modelId, modelValue in category" :value="modelId">
-                    {{modelValue}}
+            <SelectGroup v-for="provider in data">
+                <SelectLabel>{{ provider.provider }}</SelectLabel>
+                <SelectItem v-for="model in provider.models" :value="`${provider.provider}___${model.id}`">
+                    {{ model.name }}
                 </SelectItem>
             </SelectGroup>
         </SelectContent>

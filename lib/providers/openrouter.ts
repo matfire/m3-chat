@@ -1,5 +1,8 @@
 import { z } from "zod/v4";
 import { Provider, type ProviderModel } from "./base";
+import type { LanguageModelV1 } from "ai";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
+import env from "../env";
 
 const ModelSchema = z.object({
     "id": z.string(),
@@ -22,6 +25,12 @@ export class OpenRouterProvider extends Provider {
 
     public static override byok(): boolean {
         return true
+    }
+
+    public static override getProvider(modelId: string): LanguageModelV1 {
+        return createOpenRouter({
+            apiKey: env.OPENROUTER_API_KEY,
+        })(modelId)
     }
 
 }

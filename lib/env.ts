@@ -8,6 +8,7 @@ const envSchema = z.object({
     "GITHUB_CLIENT_ID": z.string(),
     "GITHUB_CLIENT_SECRET": z.string(),
     "OPENROUTER_API_KEY": z.string(),
+    "GOOGLE_API_KEY": z.string(),
     "PUSHER_KEY": z.string(),
     "PUSHER_SECRET": z.string(),
     "PUSHER_HOST": z.string().optional(),

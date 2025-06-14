@@ -1,12 +1,14 @@
 import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { user } from "./auth-schema";
 import type { MessageSender, MessageStatus } from "~/lib/types/chat";
+import type { AvailableProviders } from "~/lib/providers";
 
 export const chat = sqliteTable("chat", {
     id: text().primaryKey().$default(() => crypto.randomUUID()),
     title: text(),
     userId: text('user_id').notNull().references(()=> user.id, { onDelete: 'cascade' }),
     modelId: text('model_id').notNull(),
+    modelProvider: text('model_provider').$type<AvailableProviders>().notNull(),
     createdAt: int('created_at').notNull().$default(() => Date.now()),
     updatedAt: int('updated_at').notNull().$default(() => Date.now()).$onUpdate(() => Date.now())
 })

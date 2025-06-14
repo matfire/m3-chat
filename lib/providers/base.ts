@@ -1,3 +1,5 @@
+import type { LanguageModelV1 } from "ai";
+
 export interface ProviderModel {
     id: string;
     name: string;
@@ -16,5 +18,9 @@ export abstract class Provider {
 
     public static byok(): boolean {
         throw new Error("byok is not implemented")
+    }
+
+    public static getProvider(modelId: string): LanguageModelV1 {
+        throw new Error("getProvider not implemented")
     }
 }

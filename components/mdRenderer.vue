@@ -9,6 +9,7 @@ import { getParser } from '~/lib/md/parser';
     const renderer = getParser()
 
     const value = computedAsync(async() => {
+        if (!props.content) return ""
         return await renderer.process(props.content)
     }, null)
 </script>
