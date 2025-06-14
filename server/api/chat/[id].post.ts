@@ -4,6 +4,7 @@ import { generateMessage } from "~/lib/ai"
 import { db } from "~/lib/db"
 import { chat, message } from "~/lib/db/schemas"
 import { pusher } from "~/lib/pusher/server"
+import { generatePrivateChannel, MESSAGE_DONE_EVENT, MESSAGE_UPDATE_EVENT } from "~/lib/pusher/utils"
 
 const requestSchema = type({
     lastMessage: "string",
@@ -42,12 +43,12 @@ export default defineEventHandler(async(event) => {
             await db.update(message).set({
                 content: text
             }).where(eq(message.id, messageInstance[0].id))
-            await pusher.trigger(`chat-${chatInstance.id}`, 'new_chunk', {messageId: messageInstance[0].id, text: chunk})
+            console.log(await pusher.trigger(generatePrivateChannel(event.context.user?.id, `chat-${chatInstance.id}`), MESSAGE_UPDATE_EVENT, {messageId: messageInstance[0].id, text: chunk}))
         }
         await db.update(message).set({
             status: "done",
         }).where(eq(message.id, messageInstance[0].id))
-        await pusher.trigger(`chat-${chatInstance.id}`, 'message_done', {messageId: messageInstance[0].id})
+        await pusher.trigger(generatePrivateChannel(event.context.user?.id, `chat-${chatInstance.id}`), MESSAGE_DONE_EVENT, {messageId: messageInstance[0].id})
         resolve()
     }))
     return {}

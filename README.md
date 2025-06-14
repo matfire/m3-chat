@@ -2,6 +2,15 @@
 
 > built for the t3-chat cloneathon
 
+## Stack
+
+- Nuxt
+- Shadcn-vue
+- Better-Auth
+- Drizzle Orm
+- Pusher sdks
+- Sockudo
+
 
 ## Requirements
 

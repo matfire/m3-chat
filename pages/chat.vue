@@ -1,5 +1,8 @@
 <script lang="ts" setup>
+import { generatePrivateChannel } from '~/lib/pusher/utils'
+
 const { data, refresh } = await useFetch("/api/chat/all", {lazy:true})
+const authStore = useAuthStore()
 
 const route = useRoute()
 
@@ -7,7 +10,7 @@ onMounted(() => {
 
     const pusher = usePusher()
 
-    const channel = pusher.subscribe("thread_titles")
+    const channel = pusher.subscribe(generatePrivateChannel(authStore.user?.id, "titles"))
     channel.bind("title_updated", (data) => {
         console.log(data)
     })

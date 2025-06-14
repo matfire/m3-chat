@@ -10,7 +10,7 @@ const envSchema = z.object({
     "OPENROUTER_API_KEY": z.string(),
     "PUSHER_KEY": z.string(),
     "PUSHER_SECRET": z.string(),
-    "PUSHER_HOST": z.string(),
+    "PUSHER_HOST": z.string().optional(),
     "PUSHER_PORT": z.string().optional(),
     "PUSHER_CLUSTER": z.string().optional(),
     "NUXT_PUBLIC_PUSHER_SECURE": z.coerce.boolean().optional().default(false),
