@@ -1,9 +1,9 @@
 import { eq } from "drizzle-orm"
 import { db } from "~/lib/db"
 import { chat, message } from "~/lib/db/schemas"
+import defineAuthenticatedEventHandler from "~/utils/define-authenticated-event-handler"
 
-export default defineEventHandler(async(event) => {
-    if (!event.context.user) throw Error("unauthorized")
+export default defineAuthenticatedEventHandler(async(event) => {
     const chatId = getRouterParam(event, "id")
     if (!chatId) throw Error("no chatId provided")
     const dbChat = await db.query.chat.findFirst({where: eq(chat.id, chatId)})

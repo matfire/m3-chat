@@ -27,9 +27,9 @@ export class OpenRouterProvider extends Provider {
         return true
     }
 
-    public static override getProvider(modelId: string): LanguageModelV1 {
+    public static override getProvider(modelId: string, providerKey = env.OPENROUTER_API_KEY): LanguageModelV1 {
         return createOpenRouter({
-            apiKey: env.OPENROUTER_API_KEY,
+            apiKey: providerKey,
         })(modelId)
     }
 

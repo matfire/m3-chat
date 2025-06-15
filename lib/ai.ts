@@ -4,6 +4,10 @@ import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import env from './env';
 import type { MessageSender } from './types/chat';
 import { availableProviders, type AvailableProviders } from './providers';
+import { db } from './db';
+import { eq } from 'drizzle-orm';
+import { profile } from './db/schemas';
+import { getOrCreateProfile } from './db/helpers/profile';
 
 const threadTitleModel = "google/gemma-3n-e4b-it:free"
 
@@ -37,10 +41,12 @@ interface Message {
     content: string | null
 }
 
-export const generateMessage = async(messageHistory: Message[], modelId: string, provider: AvailableProviders = 'openrouter') => {
-    
+export const generateMessage = async(messageHistory: Message[], modelId: string, userId:string, provider: AvailableProviders = 'openrouter') => {
+    const userProfile = await getOrCreateProfile(userId)
+    if (!userProfile || !userProfile.data) throw Error("profile not found")
+    const providerKey = availableProviders[provider].byok() && provider in userProfile.data ? userProfile.data[provider] : undefined
     const {textStream} = streamText({
-        model: availableProviders[provider].getProvider(modelId),
+        model: availableProviders[provider].getProvider(modelId, providerKey),
         messages: messageHistory.map((e) => ({
             content: e.content,
             role: e.sender

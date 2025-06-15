@@ -1,7 +1,7 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { Provider, type ProviderModel } from "./base"
-import env from "../env";
 import type { LanguageModelV1 } from "ai";
+import env from "../env";
 
 export class GoogleProvider extends Provider {
     public static override getName(): string {
@@ -21,9 +21,9 @@ export class GoogleProvider extends Provider {
         return false
     }
 
-    public static override getProvider(modelId: string): LanguageModelV1 {
+    public static override getProvider(modelId: string, providerKey = env.GOOGLE_API_KEY): LanguageModelV1 {
         return createGoogleGenerativeAI({
-            apiKey: env.GOOGLE_API_KEY
+            apiKey: providerKey
         })(modelId);
     }
 }
