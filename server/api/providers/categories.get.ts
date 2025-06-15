@@ -1,8 +1,7 @@
 import { availableProviders, AvailableProviders } from "~/lib/providers";
+import defineAuthenticatedEventHandler from "~/utils/define-authenticated-event-handler";
 
-export default defineEventHandler(async(event) => {
-        if (!event.context.user) throw Error("unauthorized")
-    
+export default defineAuthenticatedEventHandler(async() => {   
         const res = []
     
         for (const key of Object.keys(availableProviders)) {

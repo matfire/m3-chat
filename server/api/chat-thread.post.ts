@@ -5,16 +5,14 @@ import { db } from "~/lib/db"
 import { chat, message } from "~/lib/db/schemas"
 import { pusher } from "~/lib/pusher/server"
 import { generatePrivateChannel, TITLE_UPDATED, TitleUpdatedSchema } from "~/lib/pusher/utils"
+import defineAuthenticatedEventHandler from "~/utils/define-authenticated-event-handler"
 
 const requestSchema = z.object({
     chatId: z.string()
 })
 
-export default defineEventHandler(async (event) => {
+export default defineAuthenticatedEventHandler(async (event) => {
     const user = event.context.user
-    if (!user) {
-        throw Error("unauthorized")
-    }
     const data = requestSchema.parse(await readBody(event))
     const chatInstance = await db.select().from(chat).where(eq(chat.id, data.chatId))
     if (chatInstance[0].userId !== user.id) throw Error("unauthorized")

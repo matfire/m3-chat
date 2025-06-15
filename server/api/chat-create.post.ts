@@ -4,6 +4,7 @@ import { chat, message } from "~/lib/db/schemas"
 import { availableProviders, type AvailableProviders } from "~/lib/providers"
 import { pusher } from "~/lib/pusher/server"
 import { generatePrivateChannel, NEW_CHAT, NewChatSchema } from "~/lib/pusher/utils"
+import defineAuthenticatedEventHandler from "~/utils/define-authenticated-event-handler"
 
 const requestSchema = z.object({
     modelId: z.string(),
@@ -11,11 +12,8 @@ const requestSchema = z.object({
     message: z.string()
 })
 
-export default defineEventHandler(async(event) => {
-    const user  = event.context.user
-    if (!user) {
-        throw Error("unauthorized")
-    }
+export default defineAuthenticatedEventHandler(async(event) => {
+    const user = event.context.user
     const data = requestSchema.parse(await readBody(event))
     const newChat = await db.insert(chat).values({
         userId: user.id,

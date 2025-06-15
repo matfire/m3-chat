@@ -1,8 +1,8 @@
 import { getOrCreateProfile } from "~/lib/db/helpers/profile";
 import { AvailableProviders, availableProviders } from "~/lib/providers";
+import defineAuthenticatedEventHandler from "~/utils/define-authenticated-event-handler";
 
-export default defineEventHandler(async(event) => {
-    if (!event.context.user) throw Error("unauthorized")
+export default defineAuthenticatedEventHandler(async(event) => {
     const userProfile = await getOrCreateProfile(event.context.user.id)
     if (!userProfile.data) throw Error("invalid profile")
     const res = []
