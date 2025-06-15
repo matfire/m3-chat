@@ -20,7 +20,7 @@ export abstract class Provider {
         throw new Error("byok is not implemented")
     }
 
-    public static getProvider(modelId: string): LanguageModelV1 {
+    public static getProvider(modelId: string, providerKey:string): LanguageModelV1 {
         throw new Error("getProvider not implemented")
     }
 }

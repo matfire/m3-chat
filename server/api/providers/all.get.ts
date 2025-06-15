@@ -1,8 +1,10 @@
+import { getOrCreateProfile } from "~/lib/db/helpers/profile";
 import { AvailableProviders, availableProviders } from "~/lib/providers";
 
 export default defineEventHandler(async(event) => {
     if (!event.context.user) throw Error("unauthorized")
-
+    const userProfile = await getOrCreateProfile(event.context.user.id)
+    if (!userProfile.data) throw Error("invalid profile")
     const res = []
 
     for (const key of Object.keys(availableProviders)) {
@@ -10,7 +12,7 @@ export default defineEventHandler(async(event) => {
         // filter if it should only show free models here (defaults to yes)
         res.push({
             provider: key as AvailableProviders,
-            models: availableModels.filter((e) => e.is_free)
+            models: key in userProfile.data ? availableModels : availableModels.filter((e) => e.is_free)
         })
     }
 

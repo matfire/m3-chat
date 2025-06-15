@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
         status: "generating"
     }).returning()
     event.waitUntil(new Promise<void>(async (resolve) => {
-        const responseStream = await generateMessage(chatHistory, chatInstance.modelId, chatInstance.modelProvider)
+        const responseStream = await generateMessage(chatHistory, chatInstance.modelId, event.context.user!.id, chatInstance.modelProvider)
         let text = ""
         for await (const chunk of responseStream) {
             text += chunk
