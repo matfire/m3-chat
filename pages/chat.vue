@@ -46,7 +46,29 @@ const handleDelete = async (chatId: string) => {
     <SidebarProvider>
         <Sidebar>
             <SidebarHeader>
-                <span class="text-xl font-bold">M3</span>
+                <div class="flex justify-between w-full">
+                    <p class="text-xl font-bold">M3</p>
+                    <DropdownMenu v-if="authStore.user">
+                        <DropdownMenuTrigger as-child>
+                            <Avatar>
+                                <AvatarImage :src="authStore.user.image" />
+                                <AvatarFallback>{{ authStore.user.name.slice(0, 2) }}</AvatarFallback>
+                            </Avatar>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuItem as-child>
+                                <NuxtLink to="/settings">
+                                    Settings
+                                </NuxtLink>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem as-child>
+                                <NuxtLink to="/out">
+                                    Sign Out
+                                </NuxtLink>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
                 <ThemeToggler />
                 <Button>
                     <NuxtLink to="/chat">New Chat</NuxtLink>

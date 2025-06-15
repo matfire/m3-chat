@@ -12,16 +12,16 @@ const requestSchema = z.object({
     createMessage: z.boolean().optional().default(false)
 })
 
-export default defineEventHandler(async(event) => {
+export default defineEventHandler(async (event) => {
     if (!event.context.user) throw Error("unauthorized")
     const data = requestSchema.parse(await readBody(event))
     const chatId = getRouterParam(event, "id")
     if (!chatId) throw Error("no chatId provided")
-    const chatInstance = await db.query.chat.findFirst({where: eq(chat.id, chatId)})
+    const chatInstance = await db.query.chat.findFirst({ where: eq(chat.id, chatId) })
     if (!chatInstance) throw Error("no chat found")
     if (chatInstance.userId !== event.context.user.id) throw Error("unauthorized")
-    const chatHistory = await db.select().from(message).where(and(eq(message.chatId, chatId), isNotNull(message.content)))
-    if (chatHistory[chatHistory.length - 1].status !== "done") throw Error("cannot generate another message while the last one is not finished")
+    let chatHistory = await db.select().from(message).where(and(eq(message.chatId, chatId), isNotNull(message.content)))
+    if (chatHistory.length && chatHistory[chatHistory.length - 1].status !== "done") throw Error("cannot generate another message while the last one is not finished")
     if (data.createMessage) {
         await db.insert(message).values({
             chatId,
@@ -30,12 +30,13 @@ export default defineEventHandler(async(event) => {
             status: "done"
         })
     }
+    chatHistory = await db.select().from(message).where(and(eq(message.chatId, chatId), isNotNull(message.content)))
     const messageInstance = await db.insert(message).values({
         chatId,
         sender: "assistant",
         status: "generating"
     }).returning()
-    event.waitUntil(new Promise<void>(async(resolve) => {
+    event.waitUntil(new Promise<void>(async (resolve) => {
         const responseStream = await generateMessage(chatHistory, chatInstance.modelId, chatInstance.modelProvider)
         let text = ""
         for await (const chunk of responseStream) {

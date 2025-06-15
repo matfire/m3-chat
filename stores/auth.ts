@@ -11,8 +11,10 @@ export const useAuthStore = defineStore('authStore', () => {
     const user = computed(() => session.value?.data?.user)
     const loading = computed(() => session.value?.isPending || clientLoading.value)
     const signOut = async() => {
+        clientLoading.value = true
         await authClient.signOut()
-        navigateTo("/login")
+        await navigateTo("/connect")
+        clientLoading.value = false
     }
     const signInSocial = async(name: "google" | "github") => {
         clientLoading.value = true
