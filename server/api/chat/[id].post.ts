@@ -19,17 +19,18 @@ export default defineEventHandler(async(event) => {
     if (!chatId) throw Error("no chatId provided")
     const chatInstance = await db.query.chat.findFirst({where: eq(chat.id, chatId)})
     if (!chatInstance) throw Error("no chat found")
-    if (chatInstance.userId !== event.context.user.id) throw Error("unauthorized")
-    const chatHistory = await db.select().from(message).where(and(eq(message.chatId, chatId), isNotNull(message.content)))
+    let chatHistory = await db.select().from(message).where(and(eq(message.chatId, chatId), isNotNull(message.content)))
     if (chatHistory[chatHistory.length - 1].status !== "done") throw Error("cannot generate another message while the last one is not finished")
-    if (data.createMessage) {
-        await db.insert(message).values({
-            chatId,
-            content: data.lastMessage,
-            sender: "user",
-            status: "done"
-        })
-    }
+    if (chatInstance.userId !== event.context.user.id) throw Error("unauthorized")
+        if (data.createMessage) {
+            await db.insert(message).values({
+                chatId,
+                content: data.lastMessage,
+                sender: "user",
+                status: "done"
+            })
+        }
+    chatHistory = await db.select().from(message).where(and(eq(message.chatId, chatId), isNotNull(message.content)))
     const messageInstance = await db.insert(message).values({
         chatId,
         sender: "assistant",
