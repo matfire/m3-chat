@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { Trash } from 'lucide-vue-next'
 import { generatePrivateChannel, NEW_CHAT, TITLE_UPDATED, type NewChatSchema, type TitleUpdatedSchema } from '~/lib/pusher/utils'
 
 const { data } = await useFetch("/api/chat/all")
@@ -76,11 +77,13 @@ const handleDelete = async (chatId: string) => {
             <SidebarContent>
                 <SidebarMenu class="space-y-6">
                     <SidebarMenuItem v-for="chat in elements" :key="chat.id">
-                        <SidebarMenuButton as-child>
-                            <NuxtLink :to="`/chat/${chat.id}`">{{ chat.title }}</NuxtLink>
-                            <Button @click="() => handleDelete(chat.id)">
-                                DELETE
-                            </Button>
+                        <SidebarMenuButton as-child class="flex space-x-2">
+                            <div class="flex space-x-2 items-center h-fit">
+                                <NuxtLink :to="`/chat/${chat.id}`">{{ chat.title }}</NuxtLink>
+                                <Button variant="destructive" @click="() => handleDelete(chat.id)">
+                                    <Trash />
+                                </Button>
+                            </div>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
