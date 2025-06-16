@@ -80,7 +80,7 @@ const handleDelete = async (chatId: string) => {
                         <SidebarMenuButton as-child class="flex space-x-2">
                             <div class="flex space-x-2 items-center h-fit">
                                 <NuxtLink :to="`/chat/${chat.id}`">{{ chat.title }}</NuxtLink>
-                                <Button variant="destructive" @click="() => handleDelete(chat.id)">
+                                <Button variant="destructive" @click.stop="() => handleDelete(chat.id)">
                                     <Trash />
                                 </Button>
                             </div>
