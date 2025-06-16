@@ -42,20 +42,24 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
+
   @keyframes accordion-down {
-  from {
-    height: 0;
+    from {
+      height: 0;
     }
-  to {
-    height: var(--reka-accordion-content-height);
+
+    to {
+      height: var(--reka-accordion-content-height);
     }
   }
+
   @keyframes accordion-up {
-  from {
-    height: var(--reka-accordion-content-height);
+    from {
+      height: var(--reka-accordion-content-height);
     }
-  to {
-    height: 0;
+
+    to {
+      height: 0;
     }
   }
 }
@@ -139,12 +143,24 @@ html.dark .shiki span {
   font-style: var(--shiki-dark-font-style) !important;
   font-weight: var(--shiki-dark-font-weight) !important;
   text-decoration: var(--shiki-dark-text-decoration) !important;
+
+
+}
+pre {
+  /* Or target: pre code, .code-block, etc. depending on your HTML structure */
+  white-space: pre;
+  /* Ensures white-space is preserved (default for pre) */
+  overflow-x: auto;
+  /* Adds a horizontal scrollbar if content overflows */
+  word-wrap: normal;
+  /* Ensures long words don't break if `word-break` is set elsewhere */
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
