@@ -2,12 +2,13 @@
 import { generatePrivateChannel, MESSAGE_DONE_EVENT, MESSAGE_UPDATE_EVENT, type MessageDoneSchema, type MessageUpdateSchema } from '~/lib/pusher/utils'
 import type { MessageSender, MessageStatus } from '~/lib/types/chat'
 import {Loader2} from"lucide-vue-next"
+import type { Message } from '~/lib/db/schemas'
 const route = useRoute()
 const { data } = await useFetch(`/api/chat/${route.params.id}`, { method: "get" })
 const chatStore = useChatStore()
 const authStore = useAuthStore()
 
-const messages = ref<{id: string, content: string | null, rendererContent: string | null, sender: MessageSender, status: MessageStatus, reasoning: string | null, rendererReasoning: string | null}[]>(data?.value?.messages ?? [])
+const messages = ref<Message[]>(data?.value?.messages ?? [])
 
 onMounted(() => {
     const pusher = usePusher()
@@ -46,10 +47,11 @@ const handleSubmit = async (value: string) => {
         content: value,
         sender: "user",
         rendererContent: null,
-        id: crypto.randomUUID(),
+        id: Math.floor(Math.random() * 100),
         status: 'done',
         reasoning: null,
-        rendererReasoning: null
+        rendererReasoning: null,
+        chatId: route.params.id! as string
     }, data)
 }
 </script>
