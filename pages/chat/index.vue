@@ -21,8 +21,11 @@
 </script>
 
 <template>
-    <SidebarTrigger />
-        <div class="flex flex-col h-full">
+    <div class="flex flex-col h-full">
+            <SidebarTrigger />
+            <div class="flex-1 flex flex-col items-center justify-center">
+                <h1 class="font-bold text-3xl">Use the Form below to start a new chat</h1>
+            </div>
             <ModelSelector @select-model="handleModelSelected" />
             <ChatInput @submit="handleSubmit" />
         </div>
