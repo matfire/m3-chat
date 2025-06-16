@@ -42,7 +42,6 @@ export default defineAuthenticatedEventHandler(async (event) => {
         let reasoning = ""
         let allIsGood = true;
         for await (const chunk of responseStream) {
-            console.log("got chunk of type: ", chunk.type)
             switch (chunk.type) {
                 case "text-delta": {
                     text += chunk.textDelta
