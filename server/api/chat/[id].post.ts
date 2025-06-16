@@ -88,7 +88,7 @@ export default defineAuthenticatedEventHandler(async (event) => {
         } else {
             await db.update(message).set({
                 status: "error"
-            })
+            }).where(eq(message.id, messageInstance[0].id))
         }
         const pusherData: MessageDoneSchema = {
             messageId: messageInstance[0].id
