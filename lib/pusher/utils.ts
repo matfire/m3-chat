@@ -11,7 +11,7 @@ const NEW_CHAT = "new_chat"
 
 const messageUpdateSchema = z.object({
     messageId: z.number(),
-    type: z.literal(["text", "reasoning"]),
+    type: z.enum(["text", "reasoning"]),
     text: z.string()
 })
 
