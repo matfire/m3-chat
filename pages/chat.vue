@@ -88,7 +88,7 @@ const handleDelete = async (chatId: string) => {
             </SidebarContent>
             <SidebarFooter />
         </Sidebar>
-        <div class="px-4 py-2">
+        <div class="px-4 py-2 w-full">
             <NuxtPage />
         </div>
     </SidebarProvider>

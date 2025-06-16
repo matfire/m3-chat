@@ -4,7 +4,7 @@
 </script>
 
 <template>
-    <main>
+    <main class="w-full h-full">
         <slot />
     </main>
 </template>
