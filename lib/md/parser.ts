@@ -11,8 +11,8 @@ const parser = unified()
     .use(remarkRehype)
     .use(rehypeShiki, {
         themes: {
-            light: "vitesse-light",
-            dark: "vitesse-dark"
+            light: "catppuccin-latte",
+            dark: "catppuccin-mocha"
         }
     }).use(rehypeStringify)
 
