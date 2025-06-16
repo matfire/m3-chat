@@ -45,12 +45,12 @@ export const generateMessage = async(messageHistory: Message[], modelId: string,
     const userProfile = await getOrCreateProfile(userId)
     if (!userProfile || !userProfile.data) throw Error("profile not found")
     const providerKey = availableProviders[provider].byok() && provider in userProfile.data ? userProfile.data[provider] : undefined
-    const {textStream} = streamText({
+    const {fullStream} = streamText({
         model: availableProviders[provider].getProvider(modelId, providerKey),
         messages: messageHistory.map((e) => ({
             content: e.content,
             role: e.sender
         }))
     })
-    return textStream
+    return fullStream
 }

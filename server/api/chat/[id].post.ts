@@ -39,22 +39,57 @@ export default defineAuthenticatedEventHandler(async (event) => {
     event.waitUntil(new Promise<void>(async (resolve) => {
         const responseStream = await generateMessage(chatHistory, chatInstance.modelId, event.context.user!.id, chatInstance.modelProvider)
         let text = ""
+        let reasoning = ""
+        let allIsGood = true;
         for await (const chunk of responseStream) {
-            text += chunk
-            await db.update(message).set({
-                content: text
-            }).where(eq(message.id, messageInstance[0].id))
-            const pusherData: MessageUpdateSchema = {
-                messageId: messageInstance[0].id,
-                text: chunk
+            console.log("got chunk of type: ", chunk.type)
+            switch (chunk.type) {
+                case "text-delta": {
+                    text += chunk.textDelta
+                    await db.update(message).set({
+                        content: text
+                    }).where(eq(message.id, messageInstance[0].id))
+                    const textUpdateData: MessageUpdateSchema = {
+                        messageId: messageInstance[0].id,
+                        type: "text",
+                        text: chunk.textDelta
+                    }
+                    await pusher.trigger(generatePrivateChannel(event.context.user?.id, `chat-${chatInstance.id}`), MESSAGE_UPDATE_EVENT, textUpdateData)
+                    break
+                }
+                case "reasoning": {
+                    reasoning += chunk.textDelta
+                    await db.update(message).set({
+                        reasoning: reasoning
+                    }).where(eq(message.id, messageInstance[0].id))
+                    const reasoningUpdateData: MessageUpdateSchema = {
+                        messageId: messageInstance[0].id,
+                        type: "reasoning",
+                        text: chunk.textDelta
+                    }
+                    await pusher.trigger(generatePrivateChannel(event.context.user?.id, `chat-${chatInstance.id}`), MESSAGE_UPDATE_EVENT, reasoningUpdateData)
+                    break
+                }
+                case "error": {
+                    console.log("error: ", chunk.error)
+                    allIsGood = false;
+                    break
+                }
             }
-            await pusher.trigger(generatePrivateChannel(event.context.user?.id, `chat-${chatInstance.id}`), MESSAGE_UPDATE_EVENT, pusherData)
         }
-        const rendererContent = await getParser().process(text)
-        await db.update(message).set({
-            status: "done",
-            rendererContent: rendererContent.toString()
-        }).where(eq(message.id, messageInstance[0].id))
+        if (allIsGood) {
+            const rendererContent = await getParser().process(text)
+            const rendererReasoning = reasoning ? await getParser().process(reasoning) : null
+            await db.update(message).set({
+                status: "done",
+                rendererContent: rendererContent.toString(),
+                rendererReasoning: rendererReasoning?.toString()
+            }).where(eq(message.id, messageInstance[0].id))
+        } else {
+            await db.update(message).set({
+                status: "error"
+            })
+        }
         const pusherData: MessageDoneSchema = {
             messageId: messageInstance[0].id
         }

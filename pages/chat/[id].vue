@@ -7,13 +7,17 @@ const { data } = await useFetch(`/api/chat/${route.params.id}`, { method: "get" 
 const chatStore = useChatStore()
 const authStore = useAuthStore()
 
-const messages = ref<{id: string, content: string | null, rendererContent: string | null, sender: MessageSender, status: MessageStatus}[]>(data?.value?.messages ?? [])
+const messages = ref<{id: string, content: string | null, rendererContent: string | null, sender: MessageSender, status: MessageStatus, reasoning: string | null, rendererReasoning: string | null}[]>(data?.value?.messages ?? [])
 
 onMounted(() => {
     const pusher = usePusher()
     const chatChannel = pusher.subscribe(generatePrivateChannel(authStore.user?.id, `chat-${route.params.id}`))
     chatChannel.bind(MESSAGE_UPDATE_EVENT, (data: MessageUpdateSchema) => {
-        appendToLastMessage(data.text)
+        if (data.type === "text") {
+            appendToLastMessage(data.text, "text")
+        } else if (data.type === "reasoning") {
+            appendToLastMessage(data.text, "reasoning")
+        }
     })
     chatChannel.bind(MESSAGE_DONE_EVENT, (data: MessageDoneSchema) => {
         messages.value[messages.value.length - 1].status = "done"
@@ -21,8 +25,12 @@ onMounted(() => {
     })
 })
 
-const appendToLastMessage = (content: string) => {
-    messages.value[messages.value.length - 1].content += content
+const appendToLastMessage = (content: string, type: "text" | "reasoning") => {
+    if (type === "reasoning") {
+            messages.value[messages.value.length - 1].reasoning += content
+    } else if (type === "text") {
+        messages.value[messages.value.length - 1].content += content
+    }
 }
 
 const handleSubmit = async (value: string) => {
@@ -39,7 +47,9 @@ const handleSubmit = async (value: string) => {
         sender: "user",
         rendererContent: null,
         id: crypto.randomUUID(),
-        status: 'done'
+        status: 'done',
+        reasoning: null,
+        rendererReasoning: null
     }, data)
 }
 </script>
@@ -59,6 +69,17 @@ const handleSubmit = async (value: string) => {
                             {{ message.content }}
                         </p>
                         <div v-if="message.sender === 'assistant'">
+                            <div v-if="message.reasoning">
+                                <Accordion type="single" collapsible>
+                                    <AccordionItem :value="message.id + '-reasoning'">
+                                        <AccordionTrigger>Reasoning</AccordionTrigger>
+                                        <AccordionContent>
+                                            <div v-html="message.rendererReasoning" v-if="message.rendererReasoning" />
+                                            <MdRenderer v-else-if="message.reasoning" :content="message.reasoning" />
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                </Accordion>
+                            </div>
                             <div v-html="message.rendererContent" v-if="message.rendererContent" />
                             <MdRenderer v-else-if="message.content" :content="message.content" />
                         </div>

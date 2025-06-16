@@ -19,5 +19,7 @@ export const message = sqliteTable("message", {
     sender: text().$type<MessageSender>().notNull(),
     status: text().$type<MessageStatus>().notNull(),
     content: text(),
+    reasoning: text(),
+    rendererReasoning: text(),
     rendererContent: text()
 })
