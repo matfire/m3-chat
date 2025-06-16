@@ -2,6 +2,7 @@ import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { user } from "./auth-schema";
 import type { MessageSender, MessageStatus } from "~/lib/types/chat";
 import type { AvailableProviders } from "~/lib/providers";
+import type { InferSelectModel } from "drizzle-orm";
 
 export const chat = sqliteTable("chat", {
     id: text().primaryKey().$default(() => crypto.randomUUID()),
@@ -19,5 +20,9 @@ export const message = sqliteTable("message", {
     sender: text().$type<MessageSender>().notNull(),
     status: text().$type<MessageStatus>().notNull(),
     content: text(),
+    reasoning: text(),
+    rendererReasoning: text(),
     rendererContent: text()
 })
+
+export type Message = InferSelectModel<typeof message>

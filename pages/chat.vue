@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { generatePrivateChannel, NEW_CHAT, TITLE_UPDATED, type NewChatSchema, type TitleUpdatedSchema } from '~/lib/pusher/utils'
 
-const { data } = await useFetch("/api/chat/all", { lazy: true })
+const { data } = await useFetch("/api/chat/all")
 const authStore = useAuthStore()
 
 const route = useRoute()
@@ -70,7 +70,7 @@ const handleDelete = async (chatId: string) => {
                     </DropdownMenu>
                 </div>
                 <ThemeToggler />
-                <Button>
+                <Button as-child>
                     <NuxtLink to="/chat">New Chat</NuxtLink>
                 </Button>
             </SidebarHeader>
