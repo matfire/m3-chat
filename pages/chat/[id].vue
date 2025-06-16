@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { generatePrivateChannel, MESSAGE_DONE_EVENT, MESSAGE_UPDATE_EVENT, type MessageDoneSchema, type MessageUpdateSchema } from '~/lib/pusher/utils'
-import type { MessageSender, MessageStatus } from '~/lib/types/chat'
 import {Loader2} from"lucide-vue-next"
 import type { Message } from '~/lib/db/schemas'
 const route = useRoute()
