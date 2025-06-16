@@ -69,7 +69,6 @@ const handleDelete = async (chatId: string) => {
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
-                <ThemeToggler />
                 <Button as-child>
                     <NuxtLink to="/chat">New Chat</NuxtLink>
                 </Button>

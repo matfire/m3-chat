@@ -42,17 +42,25 @@ import { Loader2 } from 'lucide-vue-next'
                             <TabsTrigger value="account">Account</TabsTrigger>
                             <TabsTrigger value="keys">Your Keys</TabsTrigger>
                         </TabsList>
-                        <TabsContent value="account">
-                            <div>
-                                <Button as-child variant="outline">
-                                    <NuxtLink to="/out">Log Out</NuxtLink>
-                                </Button>
-                                <Button variant="destructive">
-                                    Delete my account
-                                </Button>
+                        <TabsContent value="account" class="p-4">
+                            <div class="flex flex-col space-y-6">
+                                <div>
+                                    <div class="flex items-center space-x-2">
+                                        <span>Choose Color Theme</span>
+                                        <ThemeToggler />
+                                    </div>
+                                </div>
+                                <div class="flex flex-col space-y-4">
+                                    <Button as-child variant="outline">
+                                        <NuxtLink to="/out">Log Out</NuxtLink>
+                                    </Button>
+                                    <Button variant="destructive">
+                                        Delete my account
+                                    </Button>
+                                </div>
                             </div>
                         </TabsContent>
-                        <TabsContent value="keys">
+                        <TabsContent value="keys" class="p-4">
                                 <form class="space-y-6" @submit.prevent="handleSubmit">
                                     <div v-for="(key, provider) in keysData" :key="provider">
                                         <Label>Key for {{ provider }}</Label>
