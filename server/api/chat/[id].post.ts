@@ -14,6 +14,7 @@ const requestSchema = z.object({
     createMessage: z.boolean().optional().default(false)
 })
 
+
 export default defineAuthenticatedEventHandler(async (event) => {
     const data = requestSchema.parse(await readBody(event))
     const chatId = getRouterParam(event, "id")
@@ -60,7 +61,7 @@ export default defineAuthenticatedEventHandler(async (event) => {
                     break
                 }
             }
-            if (tempText.length > CHAT_BATCH_LENGTH) {
+            if (tempText.length >= CHAT_BATCH_LENGTH) {
                 text += tempText
                 await db.update(message).set({
                     content: text
@@ -73,7 +74,7 @@ export default defineAuthenticatedEventHandler(async (event) => {
                 await pusher.trigger(generatePrivateChannel(event.context.user?.id, `chat-${chatInstance.id}`), MESSAGE_UPDATE_EVENT, textUpdateData)
                 tempText = ""
             }
-            if (tempReasoning.length > REASON_BATCH_LENGTH) {
+            if (tempReasoning.length >= REASON_BATCH_LENGTH) {
                 reasoning += tempReasoning
                 await db.update(message).set({
                     reasoning: reasoning
