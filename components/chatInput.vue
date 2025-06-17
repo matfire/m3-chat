@@ -17,7 +17,7 @@ import { Loader2 } from 'lucide-vue-next';
 
 <template>
     <form @submit="handleSubmit" class="flex space-x-2">
-        <Input :disabled="chatStore.loading" v-model="value" type="text" placeholder="what's up doc?" />
+        <Input :disabled="chatStore.loading" v-model="value" type="text" placeholder="what's up doc?" required />
         <Button :disabled="chatStore.loading">
             <Loader2 v-if="chatStore.loading" class="animate-spin" />
             <span>Send</span>
