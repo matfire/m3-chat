@@ -12,7 +12,7 @@ import { motion } from 'motion-v';
             <motion.span
                 :initial="{y: -20, opacity: 0}"
                 :animate="{y:0, opacity:1, transition: {delay: 0.3} }"
-            >*Not affilitiated with T3Chat or T3Tools</motion.span>
+            >*Not affiliated with T3Chat or T3Tools</motion.span>
         </div>
         <motion.div
             :initial="{scale:0, opacity:0}"
