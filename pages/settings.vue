@@ -9,7 +9,7 @@ import { toast } from 'vue-sonner'
 
     const loading = ref(false)
 
-    watchEffect(() => {
+    effect(() => {
         providers.value?.filter((e) => e.byok).forEach((provider) => {
             keysData.value[provider.provider] = profile?.value?.data && provider.provider in profile.value.data ? profile.value.data[provider.provider] : ""
         })
