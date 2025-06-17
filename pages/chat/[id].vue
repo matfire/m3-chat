@@ -75,13 +75,13 @@ const handleSubmit = async (value: string) => {
                                     <AccordionItem :value="message.id + '-reasoning'">
                                         <AccordionTrigger>Reasoning</AccordionTrigger>
                                         <AccordionContent>
-                                            <div class="w-full text-wrap" v-html="message.rendererReasoning" v-if="message.rendererReasoning" />
+                                            <div class="w-full text-wrap space-y-2" v-html="message.rendererReasoning" v-if="message.rendererReasoning" />
                                             <MdRenderer v-else-if="message.reasoning" :content="message.reasoning" />
                                         </AccordionContent>
                                     </AccordionItem>
                                 </Accordion>
                             </div>
-                            <div class="" v-html="message.rendererContent" v-if="message.rendererContent" />
+                            <div class="space-y-2" v-html="message.rendererContent" v-if="message.rendererContent" />
                             <MdRenderer v-else-if="message.content" :content="message.content" />
                         </div>
                         <Loader2 class="animate-spin" v-if="message.status === 'generating'" />
