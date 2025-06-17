@@ -1,6 +1,7 @@
 import { and, eq, isNotNull } from "drizzle-orm"
 import { z } from "zod/v4"
 import { generateMessage } from "~/lib/ai"
+import { CHAT_BATCH_LENGTH, REASON_BATCH_LENGTH } from "~/lib/constants"
 import { db } from "~/lib/db"
 import { chat, message } from "~/lib/db/schemas"
 import { getParser } from "~/lib/md/parser"
@@ -41,32 +42,16 @@ export default defineAuthenticatedEventHandler(async (event) => {
         let text = ""
         let reasoning = ""
         let allIsGood = true;
+        let tempText = "";
+        let tempReasoning = "";
         for await (const chunk of responseStream) {
             switch (chunk.type) {
                 case "text-delta": {
-                    text += chunk.textDelta
-                    await db.update(message).set({
-                        content: text
-                    }).where(eq(message.id, messageInstance[0].id))
-                    const textUpdateData: MessageUpdateSchema = {
-                        messageId: messageInstance[0].id,
-                        type: "text",
-                        text: chunk.textDelta
-                    }
-                    await pusher.trigger(generatePrivateChannel(event.context.user?.id, `chat-${chatInstance.id}`), MESSAGE_UPDATE_EVENT, textUpdateData)
+                    tempText += chunk.textDelta
                     break
                 }
                 case "reasoning": {
-                    reasoning += chunk.textDelta
-                    await db.update(message).set({
-                        reasoning: reasoning
-                    }).where(eq(message.id, messageInstance[0].id))
-                    const reasoningUpdateData: MessageUpdateSchema = {
-                        messageId: messageInstance[0].id,
-                        type: "reasoning",
-                        text: chunk.textDelta
-                    }
-                    await pusher.trigger(generatePrivateChannel(event.context.user?.id, `chat-${chatInstance.id}`), MESSAGE_UPDATE_EVENT, reasoningUpdateData)
+                    tempReasoning += chunk.textDelta
                     break
                 }
                 case "error": {
@@ -75,6 +60,58 @@ export default defineAuthenticatedEventHandler(async (event) => {
                     break
                 }
             }
+            if (tempText.length > CHAT_BATCH_LENGTH) {
+                text += tempText
+                await db.update(message).set({
+                    content: text
+                }).where(eq(message.id, messageInstance[0].id))
+                const textUpdateData: MessageUpdateSchema = {
+                    messageId: messageInstance[0].id,
+                    type: "text",
+                    text: tempText
+                }
+                await pusher.trigger(generatePrivateChannel(event.context.user?.id, `chat-${chatInstance.id}`), MESSAGE_UPDATE_EVENT, textUpdateData)
+                tempText = ""
+            }
+            if (tempReasoning.length > REASON_BATCH_LENGTH) {
+                reasoning += tempReasoning
+                await db.update(message).set({
+                    reasoning: reasoning
+                }).where(eq(message.id, messageInstance[0].id))
+                const reasoningUpdateData: MessageUpdateSchema = {
+                    messageId: messageInstance[0].id,
+                    type: "reasoning",
+                    text: tempReasoning
+                }
+                await pusher.trigger(generatePrivateChannel(event.context.user?.id, `chat-${chatInstance.id}`), MESSAGE_UPDATE_EVENT, reasoningUpdateData)
+                tempReasoning = ""
+            }
+        }
+        if (tempReasoning.length > 0) {
+            reasoning += tempReasoning
+            await db.update(message).set({
+                reasoning: reasoning
+            }).where(eq(message.id, messageInstance[0].id))
+            const reasoningUpdateData: MessageUpdateSchema = {
+                messageId: messageInstance[0].id,
+                type: "reasoning",
+                text: tempReasoning
+            }
+            await pusher.trigger(generatePrivateChannel(event.context.user?.id, `chat-${chatInstance.id}`), MESSAGE_UPDATE_EVENT, reasoningUpdateData)
+            tempReasoning = ""
+        }
+        if (tempText.length > 0) {
+            text += tempText
+            await db.update(message).set({
+                content: text
+            }).where(eq(message.id, messageInstance[0].id))
+            const textUpdateData: MessageUpdateSchema = {
+                messageId: messageInstance[0].id,
+                type: "text",
+                text: tempText
+            }
+            await pusher.trigger(generatePrivateChannel(event.context.user?.id, `chat-${chatInstance.id}`), MESSAGE_UPDATE_EVENT, textUpdateData)
+            tempText = ""
         }
         if (allIsGood) {
             const rendererContent = await getParser().process(text)
