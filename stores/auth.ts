@@ -1,3 +1,4 @@
+import { toast } from "vue-sonner"
 import { authClient } from "~/lib/auth-client"
 
 export const useAuthStore = defineStore('authStore', () => {
@@ -15,6 +16,7 @@ export const useAuthStore = defineStore('authStore', () => {
         await authClient.signOut()
         await navigateTo("/connect")
         clientLoading.value = false
+        toast('see you next time!')
     }
     const signInSocial = async(name: "google" | "github") => {
         clientLoading.value = true

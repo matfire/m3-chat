@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Loader2 } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
 
     const {data: profile, refresh} = await useFetch("/api/profile")
     const {data: providers} = await useFetch("/api/providers/categories")
@@ -15,6 +16,7 @@ import { Loader2 } from 'lucide-vue-next'
     })
 
     const handleSubmit = async() => {
+        const toastId = toast.loading("saving your keys")
         loading.value = true
         await $fetch('/api/profile/keys', {
             method: "POST",
@@ -24,6 +26,7 @@ import { Loader2 } from 'lucide-vue-next'
             }
         })
         await refresh()
+        toast.success("keys saved!", {id: toastId})
         loading.value = false
     }
 
@@ -62,7 +65,7 @@ import { Loader2 } from 'lucide-vue-next'
                         </TabsContent>
                         <TabsContent value="keys" class="p-4">
                                 <form class="space-y-6" @submit.prevent="handleSubmit">
-                                    <div v-for="(key, provider) in keysData" :key="provider">
+                                    <div v-for="(key, provider) in keysData" :key="provider" class="flex flex-col space-y-4">
                                         <Label>Key for {{ provider }}</Label>
                                         <Input v-model="keysData[provider]" :disabled="loading" />
                                     </div>

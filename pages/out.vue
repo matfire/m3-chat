@@ -3,8 +3,8 @@ import { Loader2 } from 'lucide-vue-next';
 
     const store = useAuthStore()
 
-    onMounted(() => {
-        store.signOut()
+    onMounted(async() => {
+        await store.signOut()
     })
 </script>
 
