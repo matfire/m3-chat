@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Loader2 } from 'lucide-vue-next';
+import { toast } from 'vue-sonner';
 
     const store = useAuthStore()
 
@@ -8,7 +9,6 @@ onMounted(async () => {
         await store.signOut()
     } catch (err) {
         console.error(err)
-        // Assuming the global toaster is available
         toast.error('Unable to sign out – please try again.')
     }
 })
