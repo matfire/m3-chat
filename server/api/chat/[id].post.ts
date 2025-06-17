@@ -1,8 +1,10 @@
 import { and, eq, isNotNull } from "drizzle-orm"
 import { z } from "zod/v4"
 import { generateMessage } from "~/lib/ai"
+import { CHAT_BATCH_LENGTH, REASON_BATCH_LENGTH } from "~/lib/constants"
 import { db } from "~/lib/db"
 import { chat, message } from "~/lib/db/schemas"
+import env from "~/lib/env"
 import { getParser } from "~/lib/md/parser"
 import { pusher } from "~/lib/pusher/server"
 import { generatePrivateChannel, MESSAGE_DONE_EVENT, MESSAGE_UPDATE_EVENT, MessageDoneSchema, MessageUpdateSchema } from "~/lib/pusher/utils"
@@ -12,6 +14,7 @@ const requestSchema = z.object({
     lastMessage: z.string(),
     createMessage: z.boolean().optional().default(false)
 })
+
 
 export default defineAuthenticatedEventHandler(async (event) => {
     const data = requestSchema.parse(await readBody(event))
@@ -41,32 +44,37 @@ export default defineAuthenticatedEventHandler(async (event) => {
         let text = ""
         let reasoning = ""
         let allIsGood = true;
+        let tempText = "";
+        let tempReasoning = "";
+
+        const flush = async (type: "text" | "reasoning") => {
+            if (type === "text") {
+                text += tempText
+                await db.update(message).set({
+                    content: text
+                }).where(eq(message.id, messageInstance[0].id))
+            } else {
+                reasoning += tempReasoning
+                await db.update(message).set({
+                    reasoning: reasoning
+                }).where(eq(message.id, messageInstance[0].id))
+            }
+            const textUpdateData: MessageUpdateSchema = {
+                messageId: messageInstance[0].id,
+                type: type,
+                text: type === "text" ? tempText : tempReasoning
+            }
+            await pusher.trigger(generatePrivateChannel(event.context.user?.id, `chat-${chatInstance.id}`), MESSAGE_UPDATE_EVENT, textUpdateData)
+        }
+
         for await (const chunk of responseStream) {
             switch (chunk.type) {
                 case "text-delta": {
-                    text += chunk.textDelta
-                    await db.update(message).set({
-                        content: text
-                    }).where(eq(message.id, messageInstance[0].id))
-                    const textUpdateData: MessageUpdateSchema = {
-                        messageId: messageInstance[0].id,
-                        type: "text",
-                        text: chunk.textDelta
-                    }
-                    await pusher.trigger(generatePrivateChannel(event.context.user?.id, `chat-${chatInstance.id}`), MESSAGE_UPDATE_EVENT, textUpdateData)
+                    tempText += chunk.textDelta
                     break
                 }
                 case "reasoning": {
-                    reasoning += chunk.textDelta
-                    await db.update(message).set({
-                        reasoning: reasoning
-                    }).where(eq(message.id, messageInstance[0].id))
-                    const reasoningUpdateData: MessageUpdateSchema = {
-                        messageId: messageInstance[0].id,
-                        type: "reasoning",
-                        text: chunk.textDelta
-                    }
-                    await pusher.trigger(generatePrivateChannel(event.context.user?.id, `chat-${chatInstance.id}`), MESSAGE_UPDATE_EVENT, reasoningUpdateData)
+                    tempReasoning += chunk.textDelta
                     break
                 }
                 case "error": {
@@ -75,6 +83,22 @@ export default defineAuthenticatedEventHandler(async (event) => {
                     break
                 }
             }
+            if (tempText.length >= env.CHAT_BATCH_LENGTH) {
+                await flush("text");
+                tempText = ""
+            }
+            if (tempReasoning.length >= env.REASON_BATCH_LENGTH) {
+                await flush("reasoning")
+                tempReasoning = ""
+            }
+        }
+        if (tempReasoning.length > 0) {
+            await flush("reasoning")
+            tempReasoning = ""
+        }
+        if (tempText.length > 0) {
+            await flush("text")
+            tempText = ""
         }
         if (allIsGood) {
             const rendererContent = await getParser().process(text)

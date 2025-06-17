@@ -15,7 +15,9 @@ const envSchema = z.object({
     "PUSHER_PORT": z.string().optional(),
     "PUSHER_CLUSTER": z.string().optional(),
     "NUXT_PUBLIC_PUSHER_SECURE": z.coerce.boolean().optional().default(false),
-    "PUSHER_APP": z.string()
+    "PUSHER_APP": z.string(),
+    "CHAT_BATCH_LENGTH": z.coerce.number().int().default(100),
+    "REASON_BATCH_LENGTH": z.coerce.number().int().default(50)
 })
 
 
