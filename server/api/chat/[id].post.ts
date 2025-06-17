@@ -4,6 +4,7 @@ import { generateMessage } from "~/lib/ai"
 import { CHAT_BATCH_LENGTH, REASON_BATCH_LENGTH } from "~/lib/constants"
 import { db } from "~/lib/db"
 import { chat, message } from "~/lib/db/schemas"
+import env from "~/lib/env"
 import { getParser } from "~/lib/md/parser"
 import { pusher } from "~/lib/pusher/server"
 import { generatePrivateChannel, MESSAGE_DONE_EVENT, MESSAGE_UPDATE_EVENT, MessageDoneSchema, MessageUpdateSchema } from "~/lib/pusher/utils"
@@ -82,11 +83,11 @@ export default defineAuthenticatedEventHandler(async (event) => {
                     break
                 }
             }
-            if (tempText.length >= CHAT_BATCH_LENGTH) {
+            if (tempText.length >= env.CHAT_BATCH_LENGTH) {
                 await flush("text");
                 tempText = ""
             }
-            if (tempReasoning.length >= REASON_BATCH_LENGTH) {
+            if (tempReasoning.length >= env.REASON_BATCH_LENGTH) {
                 await flush("reasoning")
                 tempReasoning = ""
             }
