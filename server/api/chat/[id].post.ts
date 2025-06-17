@@ -45,6 +45,27 @@ export default defineAuthenticatedEventHandler(async (event) => {
         let allIsGood = true;
         let tempText = "";
         let tempReasoning = "";
+
+        const flush = async (type: "text" | "reasoning") => {
+            if (type === "text") {
+                text += tempText
+                await db.update(message).set({
+                    content: text
+                }).where(eq(message.id, messageInstance[0].id))
+            } else {
+                reasoning += tempReasoning
+                await db.update(message).set({
+                    reasoning: reasoning
+                }).where(eq(message.id, messageInstance[0].id))
+            }
+            const textUpdateData: MessageUpdateSchema = {
+                messageId: messageInstance[0].id,
+                type: type,
+                text: type === "text" ? tempText : tempReasoning
+            }
+            await pusher.trigger(generatePrivateChannel(event.context.user?.id, `chat-${chatInstance.id}`), MESSAGE_UPDATE_EVENT, textUpdateData)
+        }
+
         for await (const chunk of responseStream) {
             switch (chunk.type) {
                 case "text-delta": {
@@ -62,56 +83,20 @@ export default defineAuthenticatedEventHandler(async (event) => {
                 }
             }
             if (tempText.length >= CHAT_BATCH_LENGTH) {
-                text += tempText
-                await db.update(message).set({
-                    content: text
-                }).where(eq(message.id, messageInstance[0].id))
-                const textUpdateData: MessageUpdateSchema = {
-                    messageId: messageInstance[0].id,
-                    type: "text",
-                    text: tempText
-                }
-                await pusher.trigger(generatePrivateChannel(event.context.user?.id, `chat-${chatInstance.id}`), MESSAGE_UPDATE_EVENT, textUpdateData)
+                await flush("text");
                 tempText = ""
             }
             if (tempReasoning.length >= REASON_BATCH_LENGTH) {
-                reasoning += tempReasoning
-                await db.update(message).set({
-                    reasoning: reasoning
-                }).where(eq(message.id, messageInstance[0].id))
-                const reasoningUpdateData: MessageUpdateSchema = {
-                    messageId: messageInstance[0].id,
-                    type: "reasoning",
-                    text: tempReasoning
-                }
-                await pusher.trigger(generatePrivateChannel(event.context.user?.id, `chat-${chatInstance.id}`), MESSAGE_UPDATE_EVENT, reasoningUpdateData)
+                await flush("reasoning")
                 tempReasoning = ""
             }
         }
         if (tempReasoning.length > 0) {
-            reasoning += tempReasoning
-            await db.update(message).set({
-                reasoning: reasoning
-            }).where(eq(message.id, messageInstance[0].id))
-            const reasoningUpdateData: MessageUpdateSchema = {
-                messageId: messageInstance[0].id,
-                type: "reasoning",
-                text: tempReasoning
-            }
-            await pusher.trigger(generatePrivateChannel(event.context.user?.id, `chat-${chatInstance.id}`), MESSAGE_UPDATE_EVENT, reasoningUpdateData)
+            await flush("reasoning")
             tempReasoning = ""
         }
         if (tempText.length > 0) {
-            text += tempText
-            await db.update(message).set({
-                content: text
-            }).where(eq(message.id, messageInstance[0].id))
-            const textUpdateData: MessageUpdateSchema = {
-                messageId: messageInstance[0].id,
-                type: "text",
-                text: tempText
-            }
-            await pusher.trigger(generatePrivateChannel(event.context.user?.id, `chat-${chatInstance.id}`), MESSAGE_UPDATE_EVENT, textUpdateData)
+            await flush("text")
             tempText = ""
         }
         if (allIsGood) {
