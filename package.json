@@ -36,6 +36,7 @@
     "drizzle-orm": "^0.44.2",
     "eslint": "^9.28.0",
     "lucide-vue-next": "^0.513.0",
+    "motion-v": "1.2.1",
     "nuxt": "^3.17.5",
     "pinia": "^3.0.3",
     "pusher": "^5.2.0",

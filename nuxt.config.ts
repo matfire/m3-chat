@@ -23,7 +23,8 @@ export default defineNuxtConfig({
     '@nuxt/icon',
     'shadcn-nuxt',
     '@pinia/nuxt',
-    '@nuxtjs/color-mode'
+    '@nuxtjs/color-mode',
+    'motion-v/nuxt'
   ],
   shadcn: {
     prefix: '',
