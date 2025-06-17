@@ -15,5 +15,5 @@ import { getParser } from '~/lib/md/parser';
 </script>
 
 <template>
-    <div v-html="value"></div>
+    <div class="space-y-2" v-html="value"></div>
 </template>

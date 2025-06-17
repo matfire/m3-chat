@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Loader2 } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
 
     const {data: profile, refresh} = await useFetch("/api/profile")
     const {data: providers} = await useFetch("/api/providers/categories")
@@ -8,13 +9,14 @@ import { Loader2 } from 'lucide-vue-next'
 
     const loading = ref(false)
 
-    watchEffect(() => {
+    effect(() => {
         providers.value?.filter((e) => e.byok).forEach((provider) => {
             keysData.value[provider.provider] = profile?.value?.data && provider.provider in profile.value.data ? profile.value.data[provider.provider] : ""
         })
     })
 
     const handleSubmit = async() => {
+        const toastId = toast.loading("saving your keys")
         loading.value = true
         await $fetch('/api/profile/keys', {
             method: "POST",
@@ -24,6 +26,7 @@ import { Loader2 } from 'lucide-vue-next'
             }
         })
         await refresh()
+        toast.success("keys saved!", {id: toastId})
         loading.value = false
     }
 
@@ -42,19 +45,27 @@ import { Loader2 } from 'lucide-vue-next'
                             <TabsTrigger value="account">Account</TabsTrigger>
                             <TabsTrigger value="keys">Your Keys</TabsTrigger>
                         </TabsList>
-                        <TabsContent value="account">
-                            <div>
-                                <Button as-child variant="outline">
-                                    <NuxtLink to="/out">Log Out</NuxtLink>
-                                </Button>
-                                <Button variant="destructive">
-                                    Delete my account
-                                </Button>
+                        <TabsContent value="account" class="p-4">
+                            <div class="flex flex-col space-y-6">
+                                <div>
+                                    <div class="flex items-center space-x-2">
+                                        <span>Choose Color Theme</span>
+                                        <ThemeToggler />
+                                    </div>
+                                </div>
+                                <div class="flex flex-col space-y-4">
+                                    <Button as-child variant="outline">
+                                        <NuxtLink to="/out">Log Out</NuxtLink>
+                                    </Button>
+                                    <Button variant="destructive">
+                                        Delete my account
+                                    </Button>
+                                </div>
                             </div>
                         </TabsContent>
-                        <TabsContent value="keys">
+                        <TabsContent value="keys" class="p-4">
                                 <form class="space-y-6" @submit.prevent="handleSubmit">
-                                    <div v-for="(key, provider) in keysData" :key="provider">
+                                    <div v-for="(key, provider) in keysData" :key="provider" class="flex flex-col space-y-4">
                                         <Label>Key for {{ provider }}</Label>
                                         <Input v-model="keysData[provider]" :disabled="loading" />
                                     </div>
