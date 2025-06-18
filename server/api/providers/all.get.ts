@@ -12,7 +12,7 @@ export default defineAuthenticatedEventHandler(async(event) => {
         // filter if it should only show free models here (defaults to yes)
         res.push({
             provider: key as AvailableProviders,
-            models: key in userProfile.data ? availableModels : availableModels.filter((e) => e.is_free)
+            models: key in userProfile.data && userProfile.data[key] ? availableModels : availableModels.filter((e) => e.is_free)
         })
     }
 
