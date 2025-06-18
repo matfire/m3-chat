@@ -24,7 +24,8 @@ export default defineNuxtConfig({
     'shadcn-nuxt',
     '@pinia/nuxt',
     '@nuxtjs/color-mode',
-    'motion-v/nuxt'
+    'motion-v/nuxt',
+    'nuxt-csurf'
   ],
   shadcn: {
     prefix: '',
@@ -40,6 +41,11 @@ export default defineNuxtConfig({
       pusherPort: env.PUSHER_PORT,
       pusherSecure: env.NUXT_PUBLIC_PUSHER_SECURE,
       pusherCluster: env.PUSHER_CLUSTER ?? "eu"
+    }
+  },
+  routeRules: {
+    '/api/pusher/auth': {
+      csurf: false
     }
   }
 })

@@ -1,11 +1,13 @@
 <script setup lang="ts">
     const chatStore = useChatStore()
+    const { $csrfFetch } = useNuxtApp()
+
     const selectedModel = ref("")
     const selectedProvider = ref("")
 
     const handleSubmit = async(input: string) => {
         chatStore.setIsLoading(true)
-        const res = await $fetch("/api/chat-create", {method:"POST", body: {
+        const res = await $csrfFetch("/api/chat-create", {method:"POST", body: {
             message: input,
             modelId: selectedModel.value,
             modelProvider: selectedProvider.value

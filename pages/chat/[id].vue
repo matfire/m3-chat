@@ -3,7 +3,9 @@ import { generatePrivateChannel, MESSAGE_DONE_EVENT, MESSAGE_UPDATE_EVENT, NEW_C
 import {Loader2} from"lucide-vue-next"
 import type { Message } from '~/lib/db/schemas'
 const route = useRoute()
-const { data } = await useFetch(`/api/chat/${route.params.id}`, { method: "get" })
+const { $csrfFetch } = useNuxtApp()
+
+const { data } = await useCsrfFetch(`/api/chat/${route.params.id}`, { method: "get" })
 const chatStore = useChatStore()
 const authStore = useAuthStore()
 
@@ -44,7 +46,7 @@ const appendToLastMessage = (content: string, type: "text" | "reasoning") => {
 
 const handleSubmit = async (value: string) => {
     chatStore.setIsLoading(true)
-    const data = await $fetch(`/api/chat/${route.params.id}`, {
+    const data = await $csrfFetch(`/api/chat/${route.params.id}`, {
         method: "post",
         body: {
             lastMessage: value,

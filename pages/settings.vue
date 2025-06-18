@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { Loader2 } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
+const { $csrfFetch } = useNuxtApp()
 
-    const {data: profile, refresh} = await useFetch("/api/profile")
-    const {data: providers} = await useFetch("/api/providers/categories")
+    const {data: profile, refresh} = await useCsrfFetch("/api/profile")
+    const {data: providers} = await useCsrfFetch("/api/providers/categories")
 
     const keysData = ref<Record<string, string>>({})
 
@@ -18,7 +19,7 @@ import { toast } from 'vue-sonner'
     const handleSubmit = async() => {
         const toastId = toast.loading("saving your keys")
         loading.value = true
-        await $fetch('/api/profile/keys', {
+        await $csrfFetch('/api/profile/keys', {
             method: "POST",
             body: {
                 profileId: profile.value?.id,
@@ -67,7 +68,7 @@ import { toast } from 'vue-sonner'
                                 <form class="space-y-6" @submit.prevent="handleSubmit">
                                     <div v-for="(key, provider) in keysData" :key="provider" class="flex flex-col space-y-4">
                                         <Label>Key for {{ provider }}</Label>
-                                        <Input v-model="keysData[provider]" :disabled="loading" />
+                                        <Input type="password" v-model="keysData[provider]" :disabled="loading" />
                                     </div>
                                     <Button :disabled="loading" class="w-full">
                                         <Loader2 v-if="loading" class="animate-spin" />

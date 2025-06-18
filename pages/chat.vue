@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { Trash } from 'lucide-vue-next'
 import { generatePrivateChannel, NEW_CHAT, TITLE_UPDATED, type NewChatSchema, type TitleUpdatedSchema } from '~/lib/pusher/utils'
-
-const { data } = await useFetch("/api/chat/all")
+const { $csrfFetch } = useNuxtApp()
+const { data } = await useCsrfFetch("/api/chat/all")
 const authStore = useAuthStore()
 
 const route = useRoute()
@@ -32,7 +32,7 @@ onMounted(() => {
 })
 
 const handleDelete = async (chatId: string) => {
-    await $fetch(`/api/chat/${chatId}`, {
+    await $csrfFetch(`/api/chat/${chatId}`, {
         method: "DELETE"
     })
     const existingIndex = elements.value.findIndex(t => t.id === chatId);
@@ -52,7 +52,7 @@ const handleDelete = async (chatId: string) => {
                     <DropdownMenu v-if="authStore.user">
                         <DropdownMenuTrigger as-child>
                             <Avatar>
-                                <AvatarImage :src="authStore.user.image" />
+                                <AvatarImage v-if="authStore.user.image" :src="authStore.user.image" />
                                 <AvatarFallback>{{ authStore.user.name.slice(0, 2) }}</AvatarFallback>
                             </Avatar>
                         </DropdownMenuTrigger>

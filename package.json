@@ -38,6 +38,7 @@
     "lucide-vue-next": "^0.513.0",
     "motion-v": "1.2.1",
     "nuxt": "^3.17.5",
+    "nuxt-csurf": "1.6.5",
     "pinia": "^3.0.3",
     "pusher": "^5.2.0",
     "pusher-js": "^8.4.0",
