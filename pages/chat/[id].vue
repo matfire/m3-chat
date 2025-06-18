@@ -51,7 +51,7 @@ const handleSubmit = async (value: string) => {
         reasoning: null,
         rendererReasoning: null,
         chatId: route.params.id! as string
-    }, data)
+    }, {...data, content: "", reasoning: ""})
 }
 </script>
 
