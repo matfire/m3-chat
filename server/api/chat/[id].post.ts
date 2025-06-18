@@ -1,7 +1,6 @@
 import { and, eq, isNotNull } from "drizzle-orm"
 import { z } from "zod/v4"
 import { generateMessage } from "~/lib/ai"
-import { CHAT_BATCH_LENGTH, REASON_BATCH_LENGTH } from "~/lib/constants"
 import { db } from "~/lib/db"
 import { chat, message } from "~/lib/db/schemas"
 import env from "~/lib/env"
