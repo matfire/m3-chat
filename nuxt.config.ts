@@ -46,6 +46,9 @@ export default defineNuxtConfig({
   routeRules: {
     '/api/pusher/auth': {
       csurf: false
+    },
+    '/api/auth/**': {
+      csurf: false
     }
   }
 })
