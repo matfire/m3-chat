@@ -3,7 +3,7 @@ import { motion } from 'motion-v';
 </script>
 
 <template>
-    <section class="bg-gradient-to-br from-slate-900 to-slate-800 min-h-screen flex flex-col items-center justify-center space-y-4">
+    <section class="bg-gradient-to-br from-slate-900 to-slate-800 min-h-screen flex flex-col items-center justify-center space-y-4 text-white dark:text-white">
         <div class="flex flex-col items-center justify-center">
             <motion.h1
                 :initial="{y: -20, opacity: 0}"
