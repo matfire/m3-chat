@@ -49,6 +49,9 @@ export default defineNuxtConfig({
     },
     '/api/auth/**': {
       csurf: false
+    },
+    '/chat/**': {
+      ssr: false
     }
   }
 })
