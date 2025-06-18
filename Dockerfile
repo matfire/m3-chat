@@ -1,6 +1,6 @@
 # Build Stage 1
 
-FROM node:22-alpine AS build
+FROM node:22 AS build
 WORKDIR /app
 
 ENV BETTER_AUTH_SECRET=change_this
@@ -33,7 +33,7 @@ RUN pnpm run build
 
 # Build Stage 2
 
-FROM node:22-alpine
+FROM node:22
 WORKDIR /app
 
 # Only `.output` folder is needed from the build stage
