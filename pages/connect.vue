@@ -19,7 +19,7 @@ import {Loader2} from "lucide-vue-next"
                             <Icon name="uil:github" class="h-4 w-4 mr-2" />
                             GitHub
                         </Button>
-                        <Button :disabled="authStore.loading" variant="outline" class="w-full">
+                        <Button :disabled="authStore.loading" variant="outline" class="w-full" @click="authStore.signInSocial('google')">
                                 <Loader2 v-if="authStore.loading" class="w-4 h-4 mr-2 animate-spin" />
                             <Icon name="uil:google" class="h-4 w-4 mr-2" />
                             Google
