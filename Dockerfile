@@ -16,6 +16,8 @@ ENV PUSHER_KEY=change_this
 ENV PUSHER_SECRET=change_this
 ENV PUSHER_SECURE=false
 ENV PUSHER_APP=change_this
+ENV GOOGLE_CLIENT_ID=change_this
+ENV GOOGLE_CLIENT_SECRET=change_this
 
 RUN corepack enable
 
