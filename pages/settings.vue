@@ -58,9 +58,6 @@ const { $csrfFetch } = useNuxtApp()
                                     <Button as-child variant="outline">
                                         <NuxtLink to="/out">Log Out</NuxtLink>
                                     </Button>
-                                    <Button variant="destructive">
-                                        Delete my account
-                                    </Button>
                                 </div>
                             </div>
                         </TabsContent>
