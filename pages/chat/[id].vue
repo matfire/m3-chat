@@ -29,7 +29,6 @@ onMounted(() => {
         chatStore.setIsLoading(false)
     })
     titleChannel.bind(NEW_CHAT, (data: NewChatSchema) => {
-        console.log(data)
         if (route.params.id == data.id) {
             title.value = data.title
         }
