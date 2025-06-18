@@ -14,13 +14,53 @@ export class OpenRouterProvider extends Provider {
         return "OpenRouter"
     }
     public static override async getModels(): Promise<ProviderModel[]> {
-        const data = await (await fetch("https://openrouter.ai/api/v1/models")).json()
-        const models = ModelSchema.array().parse(data.data)
-        return models.map((m) => ({
-            name: m.name,
-            id: m.id,
-            is_free: m.id.endsWith(":free")
-        }))
+        return [
+            {
+                id: "google/gemma-3-12b-it:free",
+                name: "Gemma 3 12B",
+                is_free: true
+            },
+            {
+                id: "meta-llama/llama-4-maverick:free",
+                name: "LLama 4 Maverick",
+                is_free: true
+            },
+            {
+                id: "google/gemini-2.5-flash",
+                name: "Gemini 2.5 Flash",
+                is_free: false
+            },
+            {
+                id: "openai/o3-pro",
+                name: "o3 Pro",
+                is_free: false
+            },
+            {
+                id: "google/gemini-2.5-pro",
+                name: "Gemini 2.5 Pro",
+                is_free: false
+            },
+            {
+                id: "openai/o4-mini",
+                name: "o4 Mini",
+                is_free: false
+            },
+            {
+                id: "openai/o1-pro",
+                name: "o1 Pro",
+                is_free: false
+            },
+            {
+                id: "openai/o3-mini",
+                name: "o3 Mini",
+                is_free: false
+            },
+            {
+                id: "anthropic/claude-3.7-sonnet:thinking",
+                name: "Claude 3.7 Sonnet",
+                is_free: false
+            }
+        ]
     }
 
     public static override byok(): boolean {
