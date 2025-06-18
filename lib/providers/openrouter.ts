@@ -31,11 +31,6 @@ export class OpenRouterProvider extends Provider {
                 is_free: false
             },
             {
-                id: "openai/o3-pro",
-                name: "o3 Pro",
-                is_free: false
-            },
-            {
                 id: "google/gemini-2.5-pro",
                 name: "Gemini 2.5 Pro",
                 is_free: false
@@ -46,8 +41,8 @@ export class OpenRouterProvider extends Provider {
                 is_free: false
             },
             {
-                id: "openai/o1-pro",
-                name: "o1 Pro",
+                id: "mistralai/magistral-small-2506",
+                name: "Magistral Small",
                 is_free: false
             },
             {
