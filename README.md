@@ -40,6 +40,10 @@ There's a list of required and optional environment variables that are needed fo
 - NUXT_PUBLIC_PUSHER_SECURE: "true" | "false" determines whether to use wss or ws protocol
 - PUSHER_APP: app name for pusher-compatible service
 
+- CHAT_BATCH_LENGTH: minimum length of text message before it gets emitted and saved to db (defaults to 100)
+- REASON_BATCH_LENGTH: minimum length of reasoning message before it gets emitted and saved to db (defaults to 50)
+
+
 ### Programs
 
 In development, the script tries to create a local libsql database. For this, you will need to install the [turso cli](https://docs.turso.tech/cli/introduction)
