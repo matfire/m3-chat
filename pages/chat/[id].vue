@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { generatePrivateChannel, MESSAGE_DONE_EVENT, MESSAGE_UPDATE_EVENT, type MessageDoneSchema, type MessageUpdateSchema } from '~/lib/pusher/utils'
+import { generatePrivateChannel, MESSAGE_DONE_EVENT, MESSAGE_UPDATE_EVENT, NEW_CHAT, type MessageDoneSchema, type MessageUpdateSchema, type NewChatSchema } from '~/lib/pusher/utils'
 import {Loader2} from"lucide-vue-next"
 import type { Message } from '~/lib/db/schemas'
 const route = useRoute()
@@ -9,9 +9,12 @@ const authStore = useAuthStore()
 
 const messages = ref<Message[]>(data?.value?.messages ?? [])
 
+const title = ref(data?.value?.chat?.title || "New Title")
+
 onMounted(() => {
     const pusher = usePusher()
     const chatChannel = pusher.subscribe(generatePrivateChannel(authStore.user?.id, `chat-${route.params.id}`))
+    const titleChannel = pusher.subscribe(generatePrivateChannel(authStore.user?.id, "titles"))
     chatChannel.bind(MESSAGE_UPDATE_EVENT, (data: MessageUpdateSchema) => {
         if (data.type === "text") {
             appendToLastMessage(data.text, "text")
@@ -22,6 +25,12 @@ onMounted(() => {
     chatChannel.bind(MESSAGE_DONE_EVENT, (data: MessageDoneSchema) => {
         messages.value[messages.value.length - 1].status = "done"
         chatStore.setIsLoading(false)
+    })
+    titleChannel.bind(NEW_CHAT, (data: NewChatSchema) => {
+        console.log(data)
+        if (route.params.id == data.id) {
+            title.value = data.title
+        }
     })
 })
 
@@ -59,7 +68,7 @@ const handleSubmit = async (value: string) => {
     <div class="flex flex-col h-full w-full space-y-6">
         <div class="flex items-center space-x-2">
             <SidebarTrigger />
-            <h1 class="text-2xl font-bold">{{ data?.chat.title }}</h1>
+            <h1 class="text-2xl font-bold">{{ title }}</h1>
         </div>
         <div class="flex flex-col space-y-4 flex-1 w-full">
             <div v-if="data && 'messages' in data" v-for="message in messages" :key="message.id"
