@@ -2,6 +2,7 @@
 import { generatePrivateChannel, MESSAGE_DONE_EVENT, MESSAGE_UPDATE_EVENT, NEW_CHAT, type MessageDoneSchema, type MessageUpdateSchema, type NewChatSchema } from '~/lib/pusher/utils'
 import {Loader2} from"lucide-vue-next"
 import type { Message } from '~/lib/db/schemas'
+import {motion} from "motion-v"
 const route = useRoute()
 const { $csrfFetch } = useNuxtApp()
 
@@ -10,6 +11,8 @@ const chatStore = useChatStore()
 const authStore = useAuthStore()
 
 const messages = ref<Message[]>(data?.value?.messages ?? [])
+
+const showGoToBottom = ref(true)
 
 const title = ref(data?.value?.chat?.title || "New Title")
 
@@ -33,7 +36,26 @@ onMounted(() => {
             title.value = data.title
         }
     })
+    document.addEventListener("scroll", handleScrollEvent)
+    handleScrollEvent()
 })
+
+onUnmounted(() => {
+    document.removeEventListener("scroll", handleScrollEvent)
+})
+
+const handleScrollToBottom = () => {
+    document.documentElement.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: "smooth"
+    })
+}
+
+const handleScrollEvent = () => {
+    const documentHeight = document.documentElement.scrollHeight;
+    const scrollPosition = window.innerHeight + window.pageYOffset;
+    showGoToBottom.value = Math.abs(scrollPosition - documentHeight) > 5
+}
 
 const appendToLastMessage = (content: string, type: "text" | "reasoning") => {
     if (messages.value[messages.value.length - 1].sender === "user") {
@@ -79,6 +101,16 @@ const handleSubmit = async (value: string) => {
 
 <template>
     <div class="flex flex-col h-full w-full space-y-6">
+        <AnimatePresence
+        >
+            <motion.div
+            :initial="{opacity:0, y: -20}"
+            :animate="{opacity:1, y: 0}"
+            :exit="{opacity: 0, y: 20}"
+            class="fixed z-50 bottom-4 w-full  flex justify-center" v-if="showGoToBottom">
+                <Button @click="handleScrollToBottom" class="backdrop-blur-xl" variant="outline">Go to bottom</Button>
+            </motion.div>
+        </AnimatePresence>
         <div class="flex items-center space-x-2">
             <SidebarTrigger />
             <h1 class="text-2xl font-bold">{{ title }}</h1>
