@@ -48,11 +48,18 @@ I would also advise using a local pusher-compatible websocket service. I used [s
 
 ## Running the application
 
+### Migrations
+
+To run the migrations, make sure the db is setup correctly (either on Turso or locally), then run:
+```sh
+(p)npm run db:migrate
+```
+
 ### In development
 
 simply run
 ```sh
-p(npm) run dev
+(p)npm run dev
 ```
 
 ### In production
@@ -60,7 +67,7 @@ p(npm) run dev
 After building the application with
 
 ```sh
-p(npm) run build
+(p)npm run build
 ```
 
 You can run it by using
