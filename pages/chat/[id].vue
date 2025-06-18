@@ -36,6 +36,18 @@ onMounted(() => {
 })
 
 const appendToLastMessage = (content: string, type: "text" | "reasoning") => {
+    if (messages.value[messages.value.length - 1].sender === "user") {
+        messages.value.push({
+            id: messages.value[messages.value.length - 1].id + 1,
+            sender: "assistant",
+            content: "",
+            reasoning: "",
+            status: "generating",
+            rendererContent: null,
+            rendererReasoning: null,
+            chatId: route.params.id as string
+        })
+    }
     if (type === "reasoning") {
             messages.value[messages.value.length - 1].reasoning += content
     } else if (type === "text") {
