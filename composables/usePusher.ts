@@ -6,7 +6,7 @@ export const usePusher = () => {
     const runtimeConfig = useRuntimeConfig()
     const transports: Transport[] = []
     if (runtimeConfig.public.pusherSecure) {
-        transports.push("wss")
+        transports.push("wss", "ws")
     } else {
         transports.push("ws")
     }
@@ -15,7 +15,7 @@ export const usePusher = () => {
         wsHost: runtimeConfig.public.pusherHost ?? undefined,
         wsPort: runtimeConfig.public.pusherPort ? parseInt(runtimeConfig.public.pusherPort) : undefined,
         forceTLS: process.env.NUXT_PUBLIC_PUSHER_SECURE === "true",
-        //enabledTransports: transports,
+        enabledTransports: transports,
         cluster: runtimeConfig.public.pusherCluster,
         authEndpoint: '/api/pusher/auth'
     });
